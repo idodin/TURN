@@ -1,7 +1,6 @@
-grammar org.xtext.project.turn.Turn with org.eclipse.xtext.xbase.Xbase 
+grammar org.xtext.project.turn.Turn with org.eclipse.xtext.xbase.Xbase
 
 generate turn "http://www.xtext.org/project/turn/Turn"
-
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
 
 URNspec:
@@ -14,292 +13,421 @@ URNspec:
 	indConversions+=IndicatorConversion* &
 	contribContextGroups+=ContributionContextGroup* &
 	contribContexts+=ContributionContext* &
-	ucmMaps+=UCMmap*  &
+	ucmMaps+=UCMmap* &
 	concerns+=Concern* &
 	urnlinks+=URNlink* &
-	metadata+=Metadata* ;
-	
-ConcreteURNspec: '{'
-	'description' description=STRING 
-	'author' author=STRING 
-	'created' created=STRING 
-	'modified' modified=STRING 
+	scenarioGroups+=ScenarioGroup* &
+	scenarioDefs+=ScenarioDef* &
+	variables+=Variable* &
+	enumType+=EnumerationType* &
+	metadata+=Metadata*;
+
+ConcreteURNspec:
+	'{'
+	'description' description=STRING
+	'author' author=STRING
+	'created' created=STRING
+	'modified' modified=STRING
 	'version' specVersion=STRING
 	'urnVersion' urnVersion=STRING
-'}';
+	'}';
 
-Concern: 'concern' name=QualifiedName 
+Concern:
+	'concern' name=QualifiedName
 	longName=LongName ':'
-	(condition=Condition)? 
-	 element=[URNmodelElement]
-	(',' elements+=[URNmodelElement])*
-;
+	(condition=Condition)?
+	element=[URNmodelElement]
+	(',' elements+=[URNmodelElement])*;
 
-LongName: {LongName} ('#' longname= ( ID | STRING ))?;
+LongName:
+	{LongName} ('#' longname=(ID | STRING))?;
 
-Condition: 	'[' expression=Text ']' 
-	('{'(info=ConcreteCondition)? '}'
-	)?;
+Condition:
+	'[' expression=Text ']'
+	('{' (info=ConcreteCondition)? '}')?;
 
-ConcreteCondition: label=STRING
+ConcreteCondition:
+	label=STRING
 	description=STRING;
-	
-URNlink: 'link' (name=QualifiedName longName=LongName ':')? 
+
+URNlink:
+	'link' (name=QualifiedName longName=LongName ':')?
 	('type' type=Text)?
-	fromElem=[URNmodelElement] '-->' 
-	toElem=[URNmodelElement] ;
+	fromElem=[URNmodelElement] '-->'
+	toElem=[URNmodelElement];
 
-Metadata: 'metadata' (elem = [URNmodelElement | QualifiedName] ':' )?
-	  name=ID '=' value=Text ;
+Metadata:
+	'metadata' (elem=[URNmodelElement|QualifiedName] ':')?
+	name=ID '=' value=Text;
 
-URNmodelElement: ArtificialRule | StartPoint | StrategiesGroup| ContributionContextGroup | URNlink | Concern | Actor | IntentionalElement | Contribution | Decomposition | Dependency | EvaluationStrategy | LinearConversion | QualToQMappings | ContributionContext | UCMmap | RespRef |  WaitingPlace | FailurePoint | Stub | OrFork | OrJoin | AndFork | AndJoin |  Timer | ComponentRef;
+URNmodelElement:
+	ArtificialRule | StartPoint | StrategiesGroup | ContributionContextGroup | URNlink | Concern | Actor |
+	IntentionalElement | Contribution | Decomposition | Dependency | EvaluationStrategy | LinearConversion |
+	QualToQMappings | ContributionContext | UCMmap | RespRef | WaitingPlace | FailurePoint | Stub | OrFork | OrJoin |
+	AndFork | AndJoin | Timer | ComponentRef | ScenarioGroup | Initialization;
 
 Actor:
-	'actor' name=QualifiedName 
+	'actor' name=QualifiedName
 	longName=LongName '{'
 	('importance' (importance=ImportanceType | importanceQuantitative=QuantitativeValue))?
 	elems+=IntentionalElement*
-'}';
+	'}';
 
-IntentionalElement: 
-	type=IntentionalElementType name=QualifiedName 
+IntentionalElement:
+	type=IntentionalElementType name=QualifiedName
 	longName=LongName '{'
 	('importance' (importance=ImportanceType | importanceQuantitative=QuantitativeValue))?
 	('unit' unit=STRING)?
 	linksSrc+=ElementLink*
-'}';
+	'}';
 
-ElementLink: Contribution | Decomposition | Dependency;
+ElementLink:
+	Contribution | Decomposition | Dependency;
 
-Contribution: 
+Contribution:
 	(name=QualifiedName longName=LongName)?
-	'contributesTo' dest=[IntentionalElement | QualifiedName] 
-	(correlation?='correlated')? 'with' (contribution=ContributionType | 
+	'contributesTo' dest=[IntentionalElement|QualifiedName]
+	(correlation?='correlated')? 'with' (contribution=ContributionType |
 	quantitativeContribution=QuantitativeValue);
 
-Decomposition: 
+Decomposition:
 	(name=QualifiedName longName=LongName)?
-	decompositionType=DecompositionType 'decomposes' dest=[IntentionalElement | QualifiedName]
-;
+	decompositionType=DecompositionType 'decomposes' dest=[IntentionalElement|QualifiedName];
 
-Dependency: 	
+Dependency:
 	(name=QualifiedName longName=LongName)?
-	'dependsOn' dest=[IntentionalElement | QualifiedName] ;
+	'dependsOn' dest=[IntentionalElement|QualifiedName];
 
-ArtificialRule:	 (longName=STRING)? ;
+ArtificialRule:
+	(longName=STRING)?;
 
-StrategiesGroup: 'strategiesGroup' name=QualifiedName 
+StrategiesGroup:
+	'strategiesGroup' name=QualifiedName
 	longName=LongName ':'
-	evalStrategy=[EvaluationStrategy] 
-	(','evalStrategies+=[EvaluationStrategy])*
-;
-	
-EvaluationStrategy: 'strategy'  name=QualifiedName 
+	evalStrategy=[EvaluationStrategy]
+	(',' evalStrategies+=[EvaluationStrategy])*;
+
+EvaluationStrategy:
+	'strategy' name=QualifiedName
 	longName=LongName '{'
 	info=(ConcreteStrategy)?
 	evaluations+=Evaluation*
-	('includes' includedStrategy=[EvaluationStrategy] (',' includedStrategies+=[EvaluationStrategy])* )?
-'}';
+	('includes' includedStrategy=[EvaluationStrategy] (',' includedStrategies+=[EvaluationStrategy])*)?
+	'}';
 
-ConcreteStrategy: 'author' author=STRING;
+ConcreteStrategy:
+	'author' author=STRING;
 
-Evaluation: intElement=[IntentionalElement | QualifiedName] 
+Evaluation:
+	intElement=[IntentionalElement|QualifiedName]
 	(exceeds?='exceeding')? (('evaluation' (qualitativeEvaluation=QualitativeLabel | evaluation=QuantitativeValue))
-		| (indicatorEval=IndicatorEvaluation'convertedWith' conversion=[IndicatorConversion]))
-;
+	| (indicatorEval=IndicatorEvaluation 'convertedWith' conversion=[IndicatorConversion]));
 
-IndicatorEvaluation: 'real' (realWorldLabel=STRING | realWorldValue=INT);
+IndicatorEvaluation:
+	'real' (realWorldLabel=STRING | realWorldValue=INT);
 
-IndicatorConversion: LinearConversion | QualToQMappings;
+IndicatorConversion:
+	LinearConversion | QualToQMappings;
 
-LinearConversion:'linearConversion' name=QualifiedName 
-	longName=LongName'{'
+LinearConversion:
+	'linearConversion' name=QualifiedName
+	longName=LongName '{'
 	'unit' unit=STRING
 	'target' targetValue=INT
 	'threshold' thresholdValue=INT
 	'worst' worstValue=INT
-'}';
+	'}';
 
-QualToQMappings:'mappingConversion' name=QualifiedName 
-	longName=LongName'{'
+QualToQMappings:
+	'mappingConversion' name=QualifiedName
+	longName=LongName '{'
 	'unit' unit=STRING
 	mappings+=QualToQMapping+
-'}';
+	'}';
 
-QualToQMapping: (exceeds?='exceeding')? 'real' realWorldLabel=STRING '-->' (qualitativeEvaluation=QualitativeLabel | evaluation= QuantitativeValue);
+QualToQMapping:
+	(exceeds?='exceeding')? 'real' realWorldLabel=STRING '-->' (qualitativeEvaluation=QualitativeLabel |
+	evaluation=QuantitativeValue);
 
-ContributionContextGroup: 'contributionContextGroup' name=QualifiedName 
+ContributionContextGroup:
+	'contributionContextGroup' name=QualifiedName
 	longName=LongName ':'
 	contrib=[ContributionContext]
-	(',' contribs+=[ContributionContext])*
-;
-	
-ContributionContext:'contributionContext' name=QualifiedName
+	(',' contribs+=[ContributionContext])*;
+
+ContributionContext:
+	'contributionContext' name=QualifiedName
 	longName=LongName '{'
 	changes+=ContributionChange*
 	('includes' includedContext=[ContributionContext] (',' includedContexts+=[ContributionContext])*)?
-'}';
+	'}';
 
-ContributionChange: contribution=[Contribution | QualifiedName] 
+ContributionChange:
+	contribution=[Contribution|QualifiedName]
 	'with' (newContribution=ContributionType | newQuantitativeContribution=QuantitativeValue);
-	
-enum QualitativeLabel: denied | weaklyDenied | weaklySatisfied | satisfied | conflict | unknown | none;
 
-enum IntentionalElementType: softgoal | goal | task | resource | belief | indicator;
+enum QualitativeLabel:
+	denied | weaklyDenied | weaklySatisfied | satisfied | conflict | unknown | none;
 
-enum ContributionType: make | help | somePositive | unknown | someNegative| hurt | break;
+enum IntentionalElementType:
+	softgoal | goal | task | resource | belief | indicator;
 
-enum ImportanceType: high | medium | low | none;
+enum ContributionType:
+	make | help | somePositive | unknown | someNegative | hurt | break;
 
-enum DecompositionType: and | or | xor;
+enum ImportanceType:
+	high | medium | low | none;
 
-QuantitativeValue returns ecore::EInt: ('-'|'+')? INT;
+enum DecompositionType:
+	and | or | xor;
 
-UCMmap: (singleton?='singleton')?  'map' name=QualifiedName 
+QuantitativeValue returns ecore::EInt:
+	('-' | '+')? INT;
+
+UCMmap:
+	(singleton?='singleton')? 'map' name=QualifiedName
 	longName=LongName '{'
 	stubs+=StubDeclaration*
 	paths+=Path*
 	components+=ComponentRef*
 	//comment+=ML_COMMENT*
-'}';
+	'}';
 
-Path: startPoint=StartPoint
-	 pathBody = PathBody;
+Path:
+	startPoint=StartPoint
+	pathBody=PathBody;
 
-StartPoint: (('start' (name=QualifiedName longName=LongName)? (precondition=Condition)?)   | 
-	(failKind = FailureKind name=QualifiedName longName=LongName ('catches' '[['catches=STRING ']]')?))
-	;
+StartPoint:
+	({StartPoint} ('start' (name=QualifiedName longName=LongName)? (precondition=Condition)?) |
+	(failKind=FailureKind name=QualifiedName longName=LongName ('catches' '[[' catches=STRING ']]')?));
 
-FailureKind:  'abort' | 'failure';
+FailureKind:
+	'abort' | 'failure';
 
-PathBody: PathWithRegularEnd;
+PathBody:
+	PathWithRegularEnd;
 
-PathWithRegularEnd returns PathBody: PathWithReferencedEnd (pathEnd=RegularEnd)?;
+PathWithRegularEnd returns PathBody:
+	PathWithReferencedEnd (pathEnd=RegularEnd)?;
 
-PathWithReferencedEnd returns PathBody: PathWithReferencedStub (
-	 (referencedEnd=[ReferencedEnd])? ';')?;
+PathWithReferencedEnd returns PathBody:
+	PathWithReferencedStub ((referencedEnd=[ReferencedEnd])? ';')?;
 
-PathWithReferencedStub returns PathBody: PathBodyNodes ('in'
-	referencedStub=[Stub | QualifiedName] 
-	 index=PositiveInteger ';')?;
-	 
-PathBodyNodes returns PathBody:{PathBodyNodes} Arrow (pathNodes+=PathBodyNode '->')* ;	
-	
-Arrow: '->'	;
+PathWithReferencedStub returns PathBody:
+	PathBodyNodes ('in'
+	referencedStub=[Stub|QualifiedName]
+	index=PositiveInteger ';')?;
 
-PathBodyNode:   AndJoin | RespRef | OrJoin  | WaitingPlace | FailurePoint | Timer | Connect; 
+PathBodyNodes returns PathBody:
+	{PathBodyNodes} Arrow (pathNodes+=PathBodyNode '->')*;
 
-RegularEnd: EndpointWithConnect | AndFork | OrFork | Stub;
-//synchronous trigger
-EndpointWithConnect: regularEnd=EndPoint
-  ('->' connect=Connect )?;
+Arrow:
+	'->';
 
-ReferencedEnd: RespRef | OrJoin  |  AndJoin |  FailurePoint ;	
+PathBodyNode:
+	AndJoin | RespRef | OrJoin | WaitingPlace | FailurePoint | Timer | Connect;
 
-RespRef: 'X' name = QualifiedName 
+RegularEnd:
+	EndpointWithConnect | AndFork | OrFork | Stub;
+	//synchronous trigger
+EndpointWithConnect:
+	regularEnd=EndPoint
+	('->' connect=Connect)?;
+
+ReferencedEnd:
+	RespRef | OrJoin | AndJoin | FailurePoint;
+
+RespRef:
+	'X' name=QualifiedName
 	longName=LongName;
 
-OrJoin: {OrJoin} ('join' (name = QualifiedName) )
+OrJoin:
+	{OrJoin} ('join' (name=QualifiedName))
 	longName=LongName;
 
-AndJoin: ('synch' | 'sync' | '|') (name = QualifiedName)
-	longName=LongName ;
-	
-WaitingPlace: {WaitingPlace}  kind=(WAITKIND)? 'wait' (name=QualifiedName longName=LongName)?
-	(condition=Condition)? ;
+AndJoin:
+	('synch' | 'sync' | '|') (name=QualifiedName)
+	longName=LongName;
 
-Timer: {Timer} kind=(WAITKIND)? 'timer' (name=QualifiedName longName=LongName)?
-	 ('{'
-	('timeout')? timeoutCondition=(Condition)?  timeoutPath = (PathBody)?
-'}')? (condition=Condition)?;
+WaitingPlace:
+	{WaitingPlace} kind=(WAITKIND)? 'wait' (name=QualifiedName longName=LongName)?
+	(condition=Condition)?;
 
-Connect: 'trigger' 
-	connectsTo= [ConnectElement | QualifiedName] ';';
-
-ConnectElement: WaitingPlace | Timer | StartPoint;
-
-FailurePoint:{FailurePoint} 'fail' (name = QualifiedName longName=LongName)? 
-	((condition=Condition failLabel=FailureLabel) | ( failLabel=FailureLabel condition=Condition))?;
-	
-EndPoint: ('end' (name = QualifiedName longName=LongName)? (condition=Condition)? '.');
-
-OrFork: 'or'(( (name=QualifiedName longName=LongName)?  '{'
-	body=OrBody
-	'}') | condition=Condition ) 
-	(connectingOrBody=PathBody)?;
-	
-OrBody:	ElseOrForkBody;
-	
-ElseOrForkBody returns OrBody: OrForkBody ( '[else]' elseBody=PathBody)?;	
-
-OrForkBody returns OrBody:  (regularBody+=RegularOrFork)+;
-	
-RegularOrFork: condition=Condition	
-	 pathBody=PathBody;	
-	
-AndFork: 'and' (name=QualifiedName longName=LongName)?  '{'
-	('*'pathbody+=PathBody)*
-   '}'(connectingAndBody=PathBody)?;
- 
-Stub: (stubType=StubType)? ('stub' ('in' index=PositiveInteger)?) 
-	(((name = QualifiedName longName=LongName)? params=StubParameters) | 
-		(stubRef=[StubDeclaration | QualifiedName] )
-	)
+Timer:
+	{Timer} kind=(WAITKIND)? 'timer' (name=QualifiedName longName=LongName)?
 	('{'
-	outPaths+=StubOutPath*  
-	'}')? 
+	('timeout')? timeoutCondition=(Condition)? timeoutPath=(PathBody)?
+	'}')? (condition=Condition)?;
+
+Connect:
+	'trigger'
+	connectsTo=[ConnectElement|QualifiedName] ';';
+
+ConnectElement:
+	WaitingPlace | Timer | StartPoint;
+
+FailurePoint:
+	{FailurePoint} 'fail' (name=QualifiedName longName=LongName)?
+	((condition=Condition failLabel=FailureLabel) | (failLabel=FailureLabel condition=Condition))?;
+
+EndPoint:
+	('end' (name=QualifiedName longName=LongName)? (condition=Condition)? '.');
+
+OrFork:
+	'or' (((name=QualifiedName longName=LongName)? '{'
+	body=OrBody
+	'}') | condition=Condition)
+	(connectingOrBody=PathBody)?;
+
+OrBody:
+	ElseOrForkBody;
+
+ElseOrForkBody returns OrBody:
+	OrForkBody ('[else]' elseBody=PathBody)?;
+
+OrForkBody returns OrBody:
+	(regularBody+=RegularOrFork)+;
+
+RegularOrFork:
+	condition=Condition
+	pathBody=PathBody;
+
+AndFork:
+	'and' (name=QualifiedName longName=LongName)? '{'
+	('*' pathbody+=PathBody)*
+	'}' (connectingAndBody=PathBody)?;
+
+Stub:
+	(stubType=StubType)? ('stub' ('in' index=PositiveInteger)?)
+	(((name=QualifiedName longName=LongName)? params=StubParameters) |
+	(stubRef=[StubDeclaration|QualifiedName]))
+	('{'
+	outPaths+=StubOutPath*
+	'}')?
 	(connectingStubBody=PathBody)?;
 
+StubParameters:
+	{StubParameters}
+	'(' plugin+=PluginBinding* ')';
 
-StubParameters: {StubParameters}  
-	'(' plugin+=PluginBinding* ')';	
-
-StubDeclaration: name=QualifiedName longName=LongName '=' 
+StubDeclaration:
+	name=QualifiedName longName=LongName '='
 	params=StubParameters;
 
-StubOutPath: ('out' index=PositiveInteger) 
+StubOutPath:
+	('out' index=PositiveInteger)
 	('threshold' '[' threshold=PositiveInteger ']')?
-	  path=PathBody;
+	path=PathBody;
 
-PluginBinding:(condition=Condition)?
+PluginBinding:
+	(condition=Condition)?
 	('replication' replication=PositiveInteger)?
-	 map=[UCMmap] 
-	(':'binding=Binding 
+	map=[UCMmap]
+	(':' binding=Binding
 	(',' bindings+=Binding)*)?;
 
-ComponentRef:  (protected?='protected')?  kind=(COMPONENTKIND)?
-	 name=QualifiedName longName=LongName 
-	 (':' element= BoundOption (',' elements+=  BoundOption)*)?;
+ComponentRef:
+	(protected?='protected')? kind=(COMPONENTKIND)?
+	name=QualifiedName longName=LongName
+	(':' element=BoundOption (',' elements+=BoundOption)*)?;
 
-BoundOption:  BoundElement | LongBoundElement;
+BoundOption:
+	BoundElement | LongBoundElement;
 
-BoundElement: elem=[ReferencedBoundElement | QualifiedName] ;
+BoundElement:
+	elem=[ReferencedBoundElement|QualifiedName];
 
-ReferencedBoundElement: (ComponentRef | StartPoint | PathBodyNode | EndPoint | RegularEnd);
+ReferencedBoundElement:
+	(ComponentRef | StartPoint | PathBodyNode | EndPoint | RegularEnd);
 
-LongBoundElement: from=(QualifiedName) '..' to=(QualifiedName);
+LongBoundElement:
+	from=(QualifiedName) '..' to=(QualifiedName);
 
-Binding: InBinding | OutBinding | ComponentBinding;
+Binding:
+	InBinding | OutBinding | ComponentBinding;
 
-InBinding: mapStart = [StartPoint | QualifiedName]  '=' ('in' index=PositiveInteger);
+InBinding:
+	mapStart=[StartPoint|QualifiedName] '=' ('in' index=PositiveInteger);
 
-OutBinding: mapEnd = [EndPoint | QualifiedName] '=' ('out' index=PositiveInteger);
+OutBinding:
+	mapEnd=[EndPoint|QualifiedName] '=' ('out' index=PositiveInteger);
 
-ComponentBinding: componentIn=[ComponentRef | QualifiedName] '=' componentOut=[ComponentRef | QualifiedName];
+ComponentBinding:
+	componentIn=[ComponentRef|QualifiedName] '=' componentOut=[ComponentRef|QualifiedName];
 
-FailureLabel: '[[' failure=STRING ']]';
+FailureLabel:
+	'[[' failure=STRING ']]';
 
-enum WAITKIND: persistent | transient;
+enum WAITKIND:
+	persistent | transient;
 
-StubType:  'blocking' | 'synchronizing';
+StubType:
+	'blocking' | 'synchronizing';
+
+enum COMPONENTKIND:
+	team | object | process | agent | actor | parent;
+
+PositiveInteger returns ecore::EInt:
+	INT;
+
+Text:
+	content+=TextContent+;
+
+TextContent:
+	ID | ('@') | ('#') | '!' | '%' | '&' | '*' | INT;
+
+ScenarioGroup:
+	'scenarioGroup' name=QualifiedName longName=LongName
+	(':' scenario=[ScenarioDef|QualifiedName] (',' scenarios+=[ScenarioDef|QualifiedName])*);
+
+ScenarioDef:
+	'scenario' name=QualifiedName 
+	'{'
+	('pre' preconditions+=Condition)*
+	('post' postconditions+=Condition)*
+	('initialize' initialize+=Initialization)*
+	('start' startPoint+=[StartPoint|QualifiedName] (',' startPoints+=[StartPoint|QualifiedName])*)*
+	('end' endPoints+=[EndPoint|QualifiedName] (',' endPoints+=[EndPoint|QualifiedName])*)*
+	('includes' includedScenario+=[ScenarioDef|QualifiedName] (',' includedScenarios+=[ScenarioDef|QualifiedName])*)*
+	'}';
+
+Initialization:
+	BooleanInitialization | IntegerInitialization | EnumInitialization;
+
+BooleanInitialization:
+	variable=[Variable|QualifiedName] '=' value=Boolean;
+
+IntegerInitialization:
+	variable=[Variable|QualifiedName] '=' value=INT;
+
+EnumInitialization:
+	variable=[Variable|QualifiedName] '=' value=EnumerationLiteral;
+
+Variable:
+	type=DatatypeKind  name=QualifiedName;
+
+DatatypeKind:
+	PrimaryTypeKind | EnumerationTypeKind;
 	
-enum COMPONENTKIND: team | object | process | agent | actor | parent;
+PrimaryTypeKind:
+	'bool' | 'int';
+	
+EnumerationTypeKind:
+	enumerationType=[EnumerationType|QualifiedName];
 
-PositiveInteger returns ecore::EInt: INT;
+EnumerationType:
+	'enum' name=QualifiedName ':' enumLiteral+=EnumerationLiteral (',' enumLiterals+=QualifiedName)*;
 
-Text: content+=TextContent+ ;
+Boolean:
+	'true' | 'false';
 
-TextContent : ID | ('@') | ('#') | '!' | '%' | '&' | '*' | INT ;
+EnumerationLiteral:
+	name=QualifiedName;
+	
+
+
+
+
 
 
 

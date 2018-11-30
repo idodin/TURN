@@ -5,26 +5,25 @@ package org.xtext.project.turn.validation
 
 import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.validation.Check
-import org.xtext.project.turn.turn.AndFork
-import org.xtext.project.turn.turn.UCMmap
-import org.xtext.project.turn.turn.URNspec
-import org.xtext.project.turn.turn.TurnPackage
-import org.xtext.project.turn.turn.Concern
 import org.xtext.project.turn.turn.Actor
-import org.xtext.project.turn.turn.IntentionalElement
+import org.xtext.project.turn.turn.AndFork
+import org.xtext.project.turn.turn.Concern
 import org.xtext.project.turn.turn.Contribution
+import org.xtext.project.turn.turn.ContributionContext
+import org.xtext.project.turn.turn.ContributionContextGroup
 import org.xtext.project.turn.turn.Decomposition
 import org.xtext.project.turn.turn.Dependency
-import org.xtext.project.turn.turn.StrategiesGroup
 import org.xtext.project.turn.turn.EvaluationStrategy
-import org.xtext.project.turn.turn.ContributionContextGroup
-import org.xtext.project.turn.turn.ContributionContext
+import org.xtext.project.turn.turn.IntentionalElement
 import org.xtext.project.turn.turn.LinearConversion
-import org.xtext.project.turn.turn.QualToQMappings
-import org.xtext.project.turn.turn.PathBodyNodes
-import org.xtext.project.turn.turn.Path
 import org.xtext.project.turn.turn.OrFork
+import org.xtext.project.turn.turn.PathBodyNodes
+import org.xtext.project.turn.turn.QualToQMappings
+import org.xtext.project.turn.turn.StrategiesGroup
 import org.xtext.project.turn.turn.Stub
+import org.xtext.project.turn.turn.TurnPackage
+import org.xtext.project.turn.turn.UCMmap
+import org.xtext.project.turn.turn.URNspec
 
 /**
  * This class contains custom validation rules. 
@@ -203,5 +202,6 @@ class TurnValidator extends AbstractTurnValidator {
 				error("wrong order of reference",TurnPackage.Literals.PATH_BODY_NODES__PATH_NODES);}
 		}
 	}
+	
 		
 }

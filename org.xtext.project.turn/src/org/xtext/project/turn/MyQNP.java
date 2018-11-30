@@ -3,6 +3,7 @@ package org.xtext.project.turn;
 
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.naming.DefaultDeclarativeQualifiedNameProvider;
+import org.eclipse.xtext.naming.IQualifiedNameConverter;
 import org.eclipse.xtext.naming.QualifiedName;
 import org.xtext.project.turn.turn.Actor;
 import org.xtext.project.turn.turn.ComponentRef;
@@ -17,9 +18,13 @@ import org.xtext.project.turn.turn.Stub;
 import org.xtext.project.turn.turn.Timer;
 import org.xtext.project.turn.turn.UCMmap;
 
+import com.google.inject.Inject;
+
 
 
 class MyQNP extends DefaultDeclarativeQualifiedNameProvider {
+	
+	@Inject IQualifiedNameConverter qnc;
 	
 	QualifiedName qualifiedName(IntentionalElement intElem) {
 		QualifiedName intElemName=QualifiedName.create(EcoreUtil2.getContainerOfType(intElem, Actor.class).getName(), intElem.getName());
@@ -37,13 +42,11 @@ class MyQNP extends DefaultDeclarativeQualifiedNameProvider {
 	}
 	
 	QualifiedName qualifiedName(EndPoint endPoint) {
-		QualifiedName endPtname=QualifiedName.create(EcoreUtil2.getContainerOfType(endPoint, UCMmap.class).getName(), endPoint.getName());
-		return endPtname;
+		return qnc.toQualifiedName(endPoint.getName());
 	}
 	 
 	QualifiedName qualifiedName(StartPoint startPoint) {
-		QualifiedName startPtName=QualifiedName.create(EcoreUtil2.getContainerOfType(startPoint, UCMmap.class).getName(), startPoint.getName());
-		return startPtName;
+		return qnc.toQualifiedName(startPoint.getName());
 	}
 	 
 	QualifiedName qualifiedName(RespRef resp) {
@@ -69,7 +72,7 @@ class MyQNP extends DefaultDeclarativeQualifiedNameProvider {
 	QualifiedName qualifiedName(ComponentRef comp) {
 		QualifiedName compName=QualifiedName.create(comp.getName());
 		return compName;
-}
+	}
 	
 }
 
